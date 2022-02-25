@@ -30,7 +30,7 @@ class Homework(models.Model):
     status = models.CharField(max_length=20,choices=status_choice,default='Incomplete')
 
     def __str__(self):
-        return self.title
+        return f"{self.title}"
 
 
 class Todo(models.Model):
