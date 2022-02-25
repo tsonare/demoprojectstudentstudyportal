@@ -25,21 +25,39 @@ def home_not_authenticated(request):
     
 
 
-class NotesFormView(FormView):
-    template_name = 'dashboard/notes.html'
-    form_class = NotesForm
-    success_url = 'notes'    
-    def get_initial(self):
-        initial = super(NotesFormView,self).get_initial(NotesForm)
-        return initial
-    def form_valid(self, form):
-        # form.save()      
-        # import pdb;pdb.set_trace()
-        note = form.save(get_initial)
-        # note.user = self.request.user
-        note.save()
-        return super().form_valid(form)
+# class NotesFormView(FormView):
+#     template_name = 'dashboard/notes.html'
+#     form_class = NotesForm
+#     success_url = 'notes'    
+#     def get_initial(self):
+#         initial = super(NotesFormView,self).get_initial(NotesForm)
+#         return initial
+#     def form_valid(self, form):
+#         # form.save()      
+#         # import pdb;pdb.set_trace()
+#         note = form.save(get_initial)
+#         # note.user = self.request.user
+#         note.save()
+#         return super().form_valid(form)
 
+
+class NotesFormView(FormView):
+    form_class = NotesForm
+    def get_form(self,form_class):
+        form = super(NotesFormView, self).get_form(form_class)
+        form.fields['user'].widget = forms.HiddenInput()
+
+    def get_initial(self):
+        initial = super(NotesFormView, self).get_initial()
+        initial['user'] = self.request.user
+
+
+class NoteCreateView(NotesFormView,CreateView):
+    template_name = 'dashboard/notes.html'
+    model = Note
+    fields = ['title','description','user']
+    # fields['user'].widget = forms.HiddenInput()
+    success_url = 'notes'
         
     
 
@@ -84,3 +102,6 @@ def edit_note(request,pk):
     return render(request, 'dashboard/edit_note.html', context)
 
 
+
+
+# https://stackoverflow.com/questions/45128646/django-rest-framework-deny-user-from-push-when-user-is-not-object-owner
